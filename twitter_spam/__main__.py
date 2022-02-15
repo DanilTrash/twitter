@@ -1,10 +1,13 @@
 import sqlite3
+from time import sleep
 
 import requests
 from loguru import logger
 from selenium.webdriver import Remote
-
-from twitter_spam.data import GeneratedAccount
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from twitter_spam.data import GeneratedAccount, Account
 
 
 class OnlineSimService:
@@ -29,6 +32,21 @@ class Browser:
                 self.driver = Remote(command_executor=value, desired_capabilities={'acceptSslCerts': True})
             else:
                 logger.error('profile status: {} {}'.format(resp['status'], resp['message']))
+                sleep(4)
+
+    def reg_page(self):
+        url = 'https://twitter.com/i/flow/signup'
+        self.driver.get(url)
+        return
+
+    def fill_input_fields(self, account: Account, phone: str):
+        name_xpath = '//input[@name="name"]'
+        name_el = WebDriverWait(self.driver, 5).until(EC.element_to_be_clickable((By.XPATH, name_xpath)))
+        name_el.send_keys(account.first_name)
+
+    def __call__(self, *args, **kwargs):
+        self.reg_page()
+        self.fill_input_fields(*args, **kwargs)
 
 
 def main_arabic():
@@ -56,7 +74,7 @@ def main_arabic():
         print(gen_account)
         browser = Browser(multilogin_id[0])
         phone_number = service.get_phone()
-        browser
+        browser(account=gen_account, phone=phone_number)
 
 
 if __name__ == '__main__':

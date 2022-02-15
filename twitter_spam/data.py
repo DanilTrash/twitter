@@ -8,10 +8,13 @@ import pandas as pd
 from faker import Faker
 
 
-class GeneratedAccount:
+class Account:
     username: str
     password: str
     first_name: str
+
+
+class GeneratedAccount(Account):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
