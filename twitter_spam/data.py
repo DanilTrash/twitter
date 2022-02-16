@@ -26,7 +26,7 @@ class GeneratedAccount(Account):
         return str(self)
 
     def __str__(self) -> str:
-        return '\t'.join([self.username, self.password, self.first_name])
+        return ' '.join([self.username, self.password, self.first_name])
 
     def generate_password(self) -> str:
         value = ''.join([choice(string.digits + string.ascii_letters) for _ in range(12)])
@@ -34,11 +34,11 @@ class GeneratedAccount(Account):
 
     def generate_username(self) -> str:
         while True:
-            key_word = choice(open(r'..\key_words.txt').read().splitlines())
-            rnd_digits = str(choice(range(100)))
+            key_word = choice(open(r'C:\Users\KIEV-COP-4\Desktop\twitter\key_words.txt').read().splitlines())
+            rnd_digits = ''.join([choice(string.digits) for _ in range(2)])
             rnd_char = ''.join([choice(string.ascii_lowercase) for _ in range(2)])
             first_name_female = Faker().first_name_female().lower()
-            random_data = [key_word, first_name_female+rnd_digits]
+            random_data = [key_word, first_name_female+rnd_digits+rnd_char]
             result = '_'.join(random_data)
             if len(result) < 15:
                 return result
