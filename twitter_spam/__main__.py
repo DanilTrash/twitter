@@ -53,6 +53,13 @@ class Browser:
         return True
 
     def next_page(self):
+        next_2_button_xpath = '//*/div[2]/div[2]/div[2]/div'
+        element = WebDriverWait(self.driver, 5).until(
+            EC.element_to_be_clickable((By.XPATH, next_2_button_xpath))
+        )
+        element.click()
+
+    def third_page(self):
         pass
 
     def __del__(self):
@@ -98,6 +105,7 @@ class Registration:
             phone_number = service.get_operation(tzid)['number']
             browser.reg_page()
             browser.fill_input_fields(account=gen_account, phone=phone_number)
+            browser.next_page()
             for _ in range(15):
                 code = service.get_operation(tzid)
                 print(code)
