@@ -70,20 +70,21 @@ def create_table(con):
     con.commit()
 
 
-def main_arabic():
-    page_id = '103266452'
-    con = sqlite3.connect(f'../data_{page_id}.sqlite')
-    create_table(con)
-    # add_proxy(con)
-    service = OnlineSimService()
-    multilogin_ids = con.execute('select multilogin_id from data where username is NULL')
-    for multilogin_id in multilogin_ids:
-        gen_account = GeneratedAccount()
-        print(gen_account)
-        browser = Browser(multilogin_id[0])
-        phone_number = service.get_phone()
-        browser.registration(account=gen_account, phone=phone_number)
+class Registration:
+    def __init__(self):
+        page_id = '103266452'
+        con = sqlite3.connect(f'../data_{page_id}.sqlite')
+        create_table(con)
+        # add_proxy(con)
+        service = OnlineSimService()
+        multilogin_ids = con.execute('select multilogin_id from data where username is NULL')
+        for multilogin_id in multilogin_ids:
+            gen_account = GeneratedAccount()
+            print(gen_account)
+            browser = Browser(multilogin_id[0])
+            phone_number = service.get_phone()
+            browser.registration(account=gen_account, phone=phone_number)
 
 
 if __name__ == '__main__':
-    main_arabic()
+    Registration()
