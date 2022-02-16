@@ -44,29 +44,37 @@ class Browser:
         name_el = WebDriverWait(self.driver, 5).until(EC.element_to_be_clickable((By.XPATH, name_xpath)))
         name_el.send_keys(account.first_name)
 
-    def __call__(self, *args, **kwargs):
+    def registration(self, *args, **kwargs):
         self.reg_page()
         self.fill_input_fields(*args, **kwargs)
+
+
+def add_proxy(con):
+    for proxy in open('../proxies.txt').read().splitlines():
+        split_ = (':'.join(proxy.split(':')[:2]),)
+        con.execute('insert into data (proxy) values (?)', split_)
+        con.commit()
+
+
+def create_table(con):
+    query = '''
+    create table if not exists data (
+        id integer primary key,
+        multilogin_id text,
+        proxy text,
+        phone text,
+        username text,
+        password text
+    )'''
+    con.execute(query)
+    con.commit()
 
 
 def main_arabic():
     page_id = '103266452'
     con = sqlite3.connect(f'../data_{page_id}.sqlite')
-    # query = '''
-    # create table if not exists data (
-    #     id integer primary key,
-    #     multilogin_id text,
-    #     proxy text,
-    #     phone text,
-    #     username text,
-    #     password text
-    # )'''
-    # con.execute(query)
-    # con.commit()
-    # for proxy in open('../proxies.txt').read().splitlines():
-    #     split_ = (':'.join(proxy.split(':')[:2]),)
-    #     con.execute('insert into data (proxy) values (?)', split_)
-    #     con.commit()
+    create_table(con)
+    # add_proxy(con)
     service = OnlineSimService()
     multilogin_ids = con.execute('select multilogin_id from data where username is NULL')
     for multilogin_id in multilogin_ids:
@@ -74,7 +82,7 @@ def main_arabic():
         print(gen_account)
         browser = Browser(multilogin_id[0])
         phone_number = service.get_phone()
-        browser(account=gen_account, phone=phone_number)
+        browser.registration(account=gen_account, phone=phone_number)
 
 
 if __name__ == '__main__':
