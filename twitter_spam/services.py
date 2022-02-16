@@ -174,4 +174,9 @@ def test_onlinesim_get_phone():
 
 def test_onlinesim_get_operation():
     service = OnlineSimService('a518d7a9d5ea34b9d72aab65f059d6c3')
-    return service.get_operation(54421955)
+    return service.get_operation(54437574)
+
+
+if __name__ == '__main__':
+    while True:
+        print(test_onlinesim_get_phone())
