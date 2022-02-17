@@ -172,11 +172,6 @@ def test_onlinesim_get_phone():
     return service.get_phone('twitter', 380)
 
 
-def test_onlinesim_get_operation():
+def test_onlinesim_get_operation(tzid: int):
     service = OnlineSimService('a518d7a9d5ea34b9d72aab65f059d6c3')
-    return service.get_operation(54437574)
-
-
-if __name__ == '__main__':
-    while True:
-        print(test_onlinesim_get_phone())
+    return service.get_operation(tzid)
