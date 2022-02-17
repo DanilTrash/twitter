@@ -120,44 +120,45 @@ class Browser:
         self.driver.quit()
 
 
-def add_proxy(con):
-    for proxy in open('../proxies.txt').read().splitlines():
-        split_ = (':'.join(proxy.split(':')[:2]),)
-        con.execute('insert into data (proxy) values (?)', split_)
-        con.commit()
-
-
-def create_table(con):
-    query = '''
-    create table if not exists data (
-        id integer primary key,
-        multilogin_id text,
-        proxy text,
-        phone text,
-        username text,
-        password text
-    )'''
-    con.execute(query)
-    con.commit()
-
-
 class Registration:
-    def __init__(self):
-        page_id = '103266452'
-        # create_table(con)
-        # add_proxy(con)
-        service = OnlineSimService('a518d7a9d5ea34b9d72aab65f059d6c3')
-        with sqlite3.connect(f'../data_{page_id}.sqlite') as con:
-            multilogin_ids = con.execute('select multilogin_id from data where username is NULL').fetchall()
-        for multilogin_id in multilogin_ids:
 
-            #################
+    def __init__(self, page_id: str = None):
+        self.db_path = f'../data_{page_id}.sqlite'
+
+    def generate_accounts(self, amount: int = 1) -> Account:
+        for _ in range(amount):
+            gen_acc = GeneratedAccount()
+            yield gen_acc
+
+    def create_db(self):
+        query = '''
+            create table if not exists data (
+                id integer primary key,
+                multilogin_id text,
+                proxy text,
+                phone text,
+                username text,
+                password text
+            )'''
+        self.execute(query)
+
+    def execute(self, *args):
+        with sqlite3.connect(self.db_path) as con:
+            con.execute(*args)
+            con.commit()
+
+    def __call__(self, *args, **kwargs):
+        service = OnlineSimService('a518d7a9d5ea34b9d72aab65f059d6c3')
+        with sqlite3.connect(self.db_path) as con:
+            multilogin_ids = con.execute('select multilogin_id from data where username is NULL').fetchall()
+        generated_accounts = self.generate_accounts(len(multilogin_ids))
+        for multilogin_id in multilogin_ids:
             tzid = service.get_phone('twitter', 380)
             if tzid.get('response') == 'WARNING_LOW_BALANCE':
                 print(tzid)
                 sleep(10)
                 continue
-            gen_account = GeneratedAccount()
+            gen_account = next(generated_accounts)
             print(gen_account)
             phone_number = service.get_operation(tzid.get('tzid'))
             ##################
@@ -189,11 +190,10 @@ class Registration:
                     browser.username_field(gen_account.username)
                     browser.driver.refresh()
                     result_data = (gen_account.username, gen_account.password, phone_number['number'], *multilogin_id)
-                    with sqlite3.connect(f'../data_{page_id}.sqlite') as con:
-                        con.execute(
-                            'update data set username = ?, password = ?, phone = ? where multilogin_id = ?',
-                            result_data)
-                        con.commit()
+                    self.execute(
+                        'update data set username = ?, password = ?, phone = ? where multilogin_id = ?',
+                        result_data
+                    )
             except Exception as error:
                 logger.exception(error)
             finally:
@@ -202,4 +202,7 @@ class Registration:
 
 
 if __name__ == '__main__':
-    Registration()
+    registration = Registration('635278386')
+    registration.create_db()
+    while True:
+        registration()
