@@ -119,4 +119,7 @@ class Browser:
 
 
 if __name__ == '__main__':
-    browser = Browser()
+    browser = Browser('ce45f2f6-a014-4759-9d9b-0921942770d7')
+    browser.driver.get(
+        'https://www.twitter.com'
+    )

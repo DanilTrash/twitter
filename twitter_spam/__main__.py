@@ -11,9 +11,6 @@ from twitter_spam.data import GeneratedAccount, Account
 from twitter_spam.services import OnlineSimService
 
 
-
-
-
 def add_proxy(con):
     for proxy in open('../proxies.txt').read().splitlines():
         split_ = (':'.join(proxy.split(':')[:2]),)
