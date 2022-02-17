@@ -6,6 +6,7 @@ from typing import NoReturn
 import requests
 from loguru import logger
 
+from twitter_spam.browser import Browser
 from twitter_spam.data import GeneratedAccount, Account
 from twitter_spam.services import OnlineSimService
 
