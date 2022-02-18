@@ -11,9 +11,6 @@ from twitter_spam.data import GeneratedAccount, Account
 from twitter_spam.services import OnlineSimService
 
 
-
-
-
 class Registration:
 
     def __init__(self, page_id: str = None):
