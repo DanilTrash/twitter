@@ -22,9 +22,10 @@ class Browser:
             resp = requests.get(url, params=params).json()
             if resp['status'] == 'OK':
                 value = resp['value']
-                self.driver = Remote(command_executor=value, desired_capabilities={'acceptSslCerts': True})
+                self.driver = Remote(command_executor=value)
             else:
-                logger.error('profile status: {} {}'.format(resp['status'], resp['message']))
+                logger.error('{} {}'.format(resp['status'], resp['message']))
+                print('waiting for 30')
                 sleep(10)
 
     def reg_page(self):
@@ -115,11 +116,4 @@ class Browser:
         element.click()
 
     def __del__(self):
-        self.driver.quit()
-
-
-if __name__ == '__main__':
-    browser = Browser('ce45f2f6-a014-4759-9d9b-0921942770d7')
-    browser.driver.get(
-        'https://www.twitter.com'
-    )
+        self.driver.close()
