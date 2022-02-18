@@ -1,12 +1,7 @@
-import random
 import string
 from dataclasses import dataclass
 from random import choice
 
-import pandas as dp
-import sqlite3
-
-import pandas as pd
 from faker import Faker
 
 with open(r'C:\Users\KIEV-COP-4\Desktop\twitter\key_words.txt') as file:

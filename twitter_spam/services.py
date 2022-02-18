@@ -23,7 +23,7 @@ class Service(ABC):
         pass
 
     @abstractproperty
-    def balance(self) -> Optional[dict]:
+    def get_balance(self) -> Optional[dict]:
         pass
 
 
@@ -36,7 +36,7 @@ class OnlineSimService(Service):
         self.session = requests.Session()
 
     @property
-    def balance(self) -> Optional[dict]:
+    def get_balance(self) -> Optional[dict]:
         return_value = None
         method = '/getBalance.php'
         params = {
@@ -89,11 +89,15 @@ class OnlineSimService(Service):
 
 
 class SmsManService(Service):
-    api_url_v1 = 'http://api.sms-man.ru/stubs/handler_api.php'
+    api_url_v1 = 'https://api.sms-man.ru/stubs/handler_api.php'
+
     api_url_v2 = 'http://api.sms-man.ru/control'
     name = 'SmsMan'
     last_req = None
     request_id = None
+
+    def get_all_operations(self, **kwargs) -> Optional[dict]:
+        pass
 
     def get_code(self, request_id=None, wait_timeout: int = 30) -> Optional[str]:
         code = None
@@ -113,7 +117,7 @@ class SmsManService(Service):
         return code
 
     @property
-    def balance(self) -> Optional[int]:
+    def get_balance(self) -> Optional[int]:
         value = None
         params = {
             'token': self.api_key
@@ -156,6 +160,15 @@ class SmsManService(Service):
 class SmsActivateService(Service):
     name = 'SmsActivate'
 
+    def get_balance(self) -> Optional[dict]:
+        pass
+
+    def get_all_operations(self, **kwargs) -> Optional[dict]:
+        pass
+
+    def get_phone(self, **kwargs) -> Optional[dict]:
+        pass
+
 
 def test_onlinesim_get_all_operations():
     service = OnlineSimService('a518d7a9d5ea34b9d72aab65f059d6c3')
@@ -164,7 +177,7 @@ def test_onlinesim_get_all_operations():
 
 def test_onlinesim_get_balance():
     service = OnlineSimService('a518d7a9d5ea34b9d72aab65f059d6c3')
-    return service.balance
+    return service.get_balance
 
 
 def test_onlinesim_get_phone():

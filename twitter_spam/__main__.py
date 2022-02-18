@@ -1,25 +1,24 @@
 import sqlite3
-from random import choice
 from time import sleep
-from typing import NoReturn
+from typing import Generator
 
-import requests
 from loguru import logger
 
-from twitter_spam.browser import Browser
+from twitter_spam.browser import Twitter
 from twitter_spam.data import GeneratedAccount, Account
 from twitter_spam.services import OnlineSimService
+
+
+def generate_accounts(amount: int = 1) -> Generator[Account]:
+    for _ in range(amount):
+        gen_acc = GeneratedAccount()
+        yield gen_acc
 
 
 class Registration:
 
     def __init__(self, page_id: str = None):
         self.db_path = f'../data_{page_id}.sqlite'
-
-    def generate_accounts(self, amount: int = 1) -> Account:
-        for _ in range(amount):
-            gen_acc = GeneratedAccount()
-            yield gen_acc
 
     def create_db(self):
         query = '''
@@ -42,7 +41,7 @@ class Registration:
         service = OnlineSimService('a518d7a9d5ea34b9d72aab65f059d6c3')
         with sqlite3.connect(self.db_path) as con:
             multilogin_ids = con.execute('select multilogin_id from data where username is NULL').fetchall()
-        generated_accounts = self.generate_accounts(len(multilogin_ids))
+        generated_accounts = generate_accounts(len(multilogin_ids))
         for multilogin_id in multilogin_ids:
             tzid = service.get_phone('twitter', 380)
             if tzid.get('response') == 'WARNING_LOW_BALANCE':
@@ -55,7 +54,7 @@ class Registration:
             ##################
 
             ##################
-            browser = Browser(multilogin_id[0])
+            browser = Twitter(multilogin_id[0])
             try:
                 browser.reg_page()
                 browser.fill_input_fields(account=gen_account, phone=phone_number['number'])

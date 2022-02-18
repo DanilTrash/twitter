@@ -1,21 +1,23 @@
 from random import choice
 from time import sleep
-from typing import NoReturn
+from typing import NoReturn, Optional
 
 import requests
 from loguru import logger
-from selenium.webdriver import Remote, Keys
+from selenium.webdriver import Remote
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
 from twitter_spam.data import Account
 
 
-class Browser:
+class Driver:
     driver = None
 
-    def __init__(self, multilogin_id: str):
+    def __init__(self, multilogin_id: str) -> None:
         while self.driver is None:
             url = 'http://127.0.0.1:35000/api/v1/profile/start'
             params = {'automation': 'true', 'profileId': multilogin_id}
@@ -28,12 +30,19 @@ class Browser:
                 print('waiting for 30')
                 sleep(10)
 
-    def reg_page(self):
-        url = 'https://twitter.com/i/flow/signup'
-        self.driver.get(url)
-        return
 
-    def wait_for_element_to_click(self, xpath, timeout: int = 5):
+class Twitter(Driver):
+    base_url = 'https://twitter.com'
+
+    def home_page(self) -> NoReturn:
+        url = f'{self.base_url}/home'
+        self.driver.get(url)
+
+    def reg_page(self) -> NoReturn:
+        url = f'{self.base_url}/i/flow/signup'
+        self.driver.get(url)
+
+    def wait_for_element_to_click(self, xpath, timeout: int = 5) -> Optional[WebElement]:
         element = WebDriverWait(self.driver, timeout).until(
             EC.element_to_be_clickable((By.XPATH, xpath))
         )
@@ -65,7 +74,7 @@ class Browser:
         element = self.wait_for_element_to_click(next_2_button_xpath)
         element.click()
 
-    def third_page(self):
+    def third_page(self) -> NoReturn:
         sleep(1)
         next_3_botton_xpath = '//div[6]/div'
         element = self.wait_for_element_to_click(next_3_botton_xpath)
@@ -84,7 +93,7 @@ class Browser:
         element = self.wait_for_element_to_click(submit_btn_xpath)
         element.click()
 
-    def fill_password(self, password: str):
+    def fill_password(self, password: str) -> NoReturn:
         password_xpath = '//input[@name="password"]'
         element = self.wait_for_element_to_click(password_xpath)
         element.send_keys(password)
@@ -93,19 +102,19 @@ class Browser:
         element = self.wait_for_element_to_click(submit_btn_xpath)
         element.click()
 
-    def skip_photo_input(self):
+    def skip_photo_input(self) -> NoReturn:
         sleep(1)
         xpath = '//div[2]/div/div/span'
         element = self.wait_for_element_to_click(xpath)
         element.click()
 
-    def skip_about_input(self):
+    def skip_about_input(self) -> NoReturn:
         sleep(1)
         xpath = '//div[2]/div[2]/div[2]/div/div/span'
         element = self.wait_for_element_to_click(xpath)
         element.click()
 
-    def username_field(self, username: str):
+    def username_field(self, username: str) -> NoReturn:
         username_xpath = '//input[@name="username"]'
         element = self.wait_for_element_to_click(username_xpath)
         element.clear()
@@ -115,14 +124,14 @@ class Browser:
         element = self.wait_for_element_to_click(submit_xpath)
         element.click()
 
-    def spam(self, tweet, photo_path):
+    def tweet(self, tweet: str, photo_path: str) -> NoReturn:
         url = 'https://twitter.com/compose/tweet'
         self.driver.get(url)
-        self.find_element('//*/div[@aria-label="Tweet text"]').send_keys(tweet)
-        self.find_element('//*/div[@aria-label="Tweet text"]').send_keys(Keys.ENTER)
-        self.find_element('//*/div[1]/div/div/div/div/div[2]/div[3]/div/div/div[1]/input').send_keys(photo_path)
-        self.find_element('//*[@id="layers"]//div/div/span/span[text()="Tweet"]').click()
-        return True
+        self.wait_for_element_to_click('//*/div[@aria-label="Tweet text"]').send_keys(tweet)
+        self.wait_for_element_to_click('//*/div[@aria-label="Tweet text"]').send_keys(Keys.ENTER)
+        self.wait_for_element_to_click('//*/div[1]/div/div/div/div/div[2]/div[3]/div/div/div[1]/input').send_keys(
+            photo_path)
+        self.wait_for_element_to_click('//*[@id="layers"]//div/div/span/span[text()="Tweet"]').click()
 
     def __del__(self):
         self.driver.close()
