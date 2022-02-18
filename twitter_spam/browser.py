@@ -4,7 +4,7 @@ from typing import NoReturn
 
 import requests
 from loguru import logger
-from selenium.webdriver import Remote
+from selenium.webdriver import Remote, Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
@@ -114,6 +114,15 @@ class Browser:
         submit_xpath = '//div[2]/div[2]/div[2]/div/div'
         element = self.wait_for_element_to_click(submit_xpath)
         element.click()
+
+    def spam(self, tweet, photo_path):
+        url = 'https://twitter.com/compose/tweet'
+        self.driver.get(url)
+        self.find_element('//*/div[@aria-label="Tweet text"]').send_keys(tweet)
+        self.find_element('//*/div[@aria-label="Tweet text"]').send_keys(Keys.ENTER)
+        self.find_element('//*/div[1]/div/div/div/div/div[2]/div[3]/div/div/div[1]/input').send_keys(photo_path)
+        self.find_element('//*[@id="layers"]//div/div/span/span[text()="Tweet"]').click()
+        return True
 
     def __del__(self):
         self.driver.close()
