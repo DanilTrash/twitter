@@ -96,65 +96,17 @@ class SmsManService(Service):
     last_req = None
     request_id = None
 
-    def get_all_operations(self, **kwargs) -> Optional[dict]:
+    def get_balance(self) -> Optional[dict]:
         pass
 
-    def get_code(self, request_id=None, wait_timeout: int = 30) -> Optional[str]:
-        code = None
-        if request_id is not None:
-            self.request_id = request_id
-        params = {
-            'token': self.api_key,
-            'request_id': self.request_id
-        }
-        c = 0
-        logger.info('Waiting sms cdoe')
-        while code is None or c < wait_timeout:
-            value = requests.get(f'{self.api_url_v2}/get-sms', params=params).json()
-            print(value)
-            if value.get('sms_code'):
-                code = value.get('sms_code').replace(' ', '')
-        return code
+    def get_phone(self, **kwargs) -> Optional[dict]:
+        pass
 
-    @property
-    def get_balance(self) -> Optional[int]:
-        value = None
-        params = {
-            'token': self.api_key
-        }
-        try:
-            last_req = requests.get(f'{self.api_url_v2}/get-balance', params=params).json()
-            value = last_req.get('balance')
-            if value:
-                value = int(float(value))
-        except Exception as error:
-            logger.error(error)
-        finally:
-            return value
+    def get_operation(self, *args, **kwargs) -> Optional[dict]:
+        pass
 
-    def get_applications(self):
-        params = {
-            'token': self.api_key
-        }
-        value = requests.get(f'{self.api_url_v2}/applications', params=params).json()
-        return value
-
-    def get_phone(self, service: str = None, country: int = '7') -> Optional[str]:
-        return_value = None
-        applications = {item['title'].lower(): item['id'] for item in self.get_applications().values()}
-        country_codes = {380: 4, 7: 1}
-        if country not in country_codes.keys():
-            return return_value
-        params = {
-            'token': self.api_key,
-            'application_id': applications[service],
-            'country_id': country_codes[country]
-        }
-        last_req = requests.get(f'{self.api_url_v2}/get-number', params=params).json()
-        logger.info(last_req)
-        self.request_id = last_req.get('request_id')
-        return_value = last_req.get('number')
-        return return_value
+    def get_all_operations(self, **kwargs) -> Optional[dict]:
+        pass
 
 
 class SmsActivateService(Service):
