@@ -33,6 +33,16 @@ class Browser:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.driver.quit()
 
+    def spam(self, tweet, photo_path):
+        LOG.info(tweet)
+        url = 'https://twitter.com/compose/tweet'
+        self.driver.get(url)
+        self.find_element('//*/div[@aria-label="Tweet text"]').send_keys(tweet)
+        self.find_element('//*/div[@aria-label="Tweet text"]').send_keys(Keys.ENTER)
+        self.find_element('//*/div[1]/div/div/div/div/div[2]/div[3]/div/div/div[1]/input').send_keys(photo_path)
+        self.find_element('//*[@id="layers"]//div/div/span/span[text()="Tweet"]').click()
+        return True
+
     def find_element(self, xpath):
         LOG.info(xpath)
         try:
@@ -99,12 +109,3 @@ class TwitterRegistration(Browser):
 
 class TwitterSpam(Browser):
     URL = 'https://twitter.com/compose/tweet'
-
-    def spam(self, tweet, photo_path):
-        LOG.info(tweet)
-        self.driver.get(self.URL)
-        self.find_element('//*/div[@aria-label="Tweet text"]').send_keys(tweet)
-        self.find_element('//*/div[@aria-label="Tweet text"]').send_keys(Keys.ENTER)
-        self.find_element('//*/div[1]/div/div/div/div/div[2]/div[3]/div/div/div[1]/input').send_keys(photo_path)
-        self.find_element('//*[@id="layers"]//div/div/span/span[text()="Tweet"]').click()
-        return True
