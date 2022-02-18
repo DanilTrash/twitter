@@ -116,3 +116,7 @@ class Browser:
 
     def __del__(self):
         self.driver.quit()
+
+
+if __name__ == '__main__':
+    browser = Browser()
