@@ -30,6 +30,12 @@ class Driver:
                 print('waiting for 30')
                 sleep(10)
 
+    def wait_for_element_to_click(self, xpath, timeout: int = 10) -> Optional[WebElement]:
+        element = WebDriverWait(self.driver, timeout).until(
+            EC.element_to_be_clickable((By.XPATH, xpath))
+        )
+        return element
+
 
 class Twitter(Driver):
     base_url = 'https://twitter.com'
@@ -42,15 +48,15 @@ class Twitter(Driver):
         url = f'{self.base_url}/i/flow/signup'
         self.driver.get(url)
 
-    def wait_for_element_to_click(self, xpath, timeout: int = 5) -> Optional[WebElement]:
-        element = WebDriverWait(self.driver, timeout).until(
-            EC.element_to_be_clickable((By.XPATH, xpath))
-        )
-        return element
-
     def fill_input_fields(self, account: Account, phone: str) -> NoReturn:
         name_xpath = '//input[@name="name"]'
         phone_xpath = '//input[@name="phone_number"]'
+        reg_button_xpath = '//div/div[5]/div/span'
+        try:
+            reg_btn_el = self.wait_for_element_to_click(reg_button_xpath)
+            reg_btn_el.click()
+        except Exception as error:
+            logger.error(error)
         name_el = self.wait_for_element_to_click(name_xpath)
         phone_el = self.wait_for_element_to_click(phone_xpath)
         name_el.send_keys(account.first_name)

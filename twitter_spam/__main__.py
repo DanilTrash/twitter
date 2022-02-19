@@ -9,16 +9,16 @@ from twitter_spam.data import GeneratedAccount, Account
 from twitter_spam.services import OnlineSimService
 
 
-def generate_accounts(amount: int = 1) -> Generator[Account]:
-    for _ in range(amount):
-        gen_acc = GeneratedAccount()
-        yield gen_acc
-
-
 class Registration:
 
     def __init__(self, page_id: str = None):
         self.db_path = f'../data_{page_id}.sqlite'
+
+    @staticmethod
+    def generate_accounts(amount: int = 1):
+        for _ in range(amount):
+            gen_acc = GeneratedAccount()
+            yield gen_acc
 
     def create_db(self):
         query = '''
@@ -38,12 +38,16 @@ class Registration:
             con.commit()
 
     def __call__(self, *args, **kwargs):
-        service = OnlineSimService('a518d7a9d5ea34b9d72aab65f059d6c3')
+        service = OnlineSimService('a518d7a9d5ea34b9d72aab65f059d6c3', '45.135.176.221:49111')
         with sqlite3.connect(self.db_path) as con:
-            multilogin_ids = con.execute('select multilogin_id from data where username is NULL').fetchall()
-        generated_accounts = generate_accounts(len(multilogin_ids))
+            multilogin_ids = con.execute(
+                'select multilogin_id from data where username is NULL and multilogin_id is not NULL').fetchall()
+        generated_accounts = self.generate_accounts(len(multilogin_ids))
         for multilogin_id in multilogin_ids:
-            tzid = service.get_phone('twitter', 380)
+            tzid = service.get_phone('twitter', 212)
+            if not tzid:
+                print(tzid)
+                continue
             if tzid.get('response') == 'WARNING_LOW_BALANCE':
                 print(tzid)
                 sleep(10)
@@ -79,20 +83,23 @@ class Registration:
                     browser.skip_about_input()
                     browser.username_field(gen_account.username)
                     browser.driver.refresh()
+                    browser.driver.get('https://twitter.com/home')
                     result_data = (gen_account.username, gen_account.password, phone_number['number'], *multilogin_id)
                     self.execute(
                         'update data set username = ?, password = ?, phone = ? where multilogin_id = ?',
                         result_data
                     )
+                    sleep(5)
             except Exception as error:
                 logger.exception(error)
             finally:
                 del browser
+                sleep(1)
             ########################
 
 
 if __name__ == '__main__':
-    registration = Registration('635278386')
+    registration = Registration('1112505379')
     registration.create_db()
     while True:
         registration()

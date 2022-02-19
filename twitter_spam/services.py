@@ -31,9 +31,10 @@ class OnlineSimService(Service):
     name = 'OnlineSimApi'
     api_url = 'https://onlinesim.ru/api/'
 
-    def __init__(self, *args, proxy=None):
-        super().__init__(*args)
+    def __init__(self, api_key: str, proxy=None):
+        super().__init__(api_key)
         self.session = requests.Session()
+        self.session.proxies = {'https': f'http://{proxy}'}
 
     @property
     def get_balance(self) -> Optional[dict]:
@@ -91,7 +92,7 @@ class OnlineSimService(Service):
 class SmsManService(Service):
     api_url_v1 = 'https://api.sms-man.ru/stubs/handler_api.php'
 
-    api_url_v2 = 'http://api.sms-man.ru/control'
+    api_url_v2 = 'https://api.sms-man.ru/control'
     name = 'SmsMan'
     last_req = None
     request_id = None
