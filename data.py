@@ -4,7 +4,7 @@ from random import choice
 
 from faker import Faker
 
-with open(r'/key_words.txt') as file:
+with open(r'key_words.txt') as file:
     key_words = file.read().splitlines()
 
 

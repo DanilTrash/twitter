@@ -120,7 +120,7 @@ class Twitter(Driver):
 class Registration:
 
     def __init__(self, page_id: str = None):
-        self.db_path = f'../data_{page_id}.sqlite'
+        self.db_path = f'data_{page_id}.sqlite'
 
     @staticmethod
     def generate_accounts(amount: int = 1):
@@ -204,10 +204,3 @@ class Registration:
                 del browser
                 sleep(1)
             ########################
-
-
-if __name__ == '__main__':
-    registration = Registration('1112505379')
-    registration.create_db()
-    while True:
-        registration()
