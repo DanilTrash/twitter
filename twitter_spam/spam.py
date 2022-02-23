@@ -7,7 +7,7 @@ from loguru import logger
 from selenium.webdriver.common.keys import Keys
 
 from browser import Driver
-from data import GeneratedAccount, Account
+from data import GeneratedTwitter, Account
 from services import OnlineSimService
 
 
@@ -122,12 +122,6 @@ class Registration:
     def __init__(self, page_id: str = None):
         self.db_path = f'data_{page_id}.sqlite'
 
-    @staticmethod
-    def generate_accounts(amount: int = 1):
-        for _ in range(amount):
-            gen_acc = GeneratedAccount()
-            yield gen_acc
-
     def create_db(self):
         query = '''
             create table if not exists data (
@@ -150,7 +144,6 @@ class Registration:
         with sqlite3.connect(self.db_path) as con:
             multilogin_ids = con.execute(
                 'select multilogin_id from data where username is NULL and multilogin_id is not NULL').fetchall()
-        generated_accounts = self.generate_accounts(len(multilogin_ids))
         for multilogin_id in multilogin_ids:
             tzid = service.get_phone('twitter', 212)
             if not tzid:
@@ -160,7 +153,7 @@ class Registration:
                 print(tzid)
                 sleep(10)
                 continue
-            gen_account = next(generated_accounts)
+            gen_account = GeneratedTwitter('ar_AA')
             print(gen_account)
             phone_number = service.get_operation(tzid.get('tzid'))
             ##################

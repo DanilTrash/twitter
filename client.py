@@ -6,5 +6,3 @@ def twitter():
     registration.create_db()
     while True:
         registration()
-
-
